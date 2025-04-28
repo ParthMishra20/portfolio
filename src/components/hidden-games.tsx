@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 
 // Simple Tetris game implementation
@@ -30,8 +30,8 @@ const useTetris = () => {
   const lastTimeRef = useRef<number>(0);
   const dropInterval = useRef<number>(1000); // ms
   
-  // Tetromino shapes
-  const tetrominoes = [
+  // Tetromino shapes - wrap in useMemo to prevent recreating on each render
+  const tetrominoes = useMemo(() => [
     { shape: [[1, 1], [1, 1]], color: '#ffd600' }, // square
     { shape: [[0, 1, 0], [1, 1, 1]], color: '#9c27b0' }, // T
     { shape: [[0, 1, 1], [1, 1, 0]], color: '#4caf50' }, // Z
@@ -39,17 +39,9 @@ const useTetris = () => {
     { shape: [[1, 1, 1, 1]], color: '#00bcd4' }, // I
     { shape: [[1, 0, 0], [1, 1, 1]], color: '#2196f3' }, // L
     { shape: [[0, 0, 1], [1, 1, 1]], color: '#ff9800' }, // J
-  ];
+  ], []);
 
-  const resetGame = useCallback(() => {
-    setBoard(Array(BOARD_HEIGHT).fill(0).map(() => Array(BOARD_WIDTH).fill(0)));
-    generateNewPiece();
-    setScore(0);
-    setGameOver(false);
-    setPaused(false);
-    dropInterval.current = 1000;
-  }, []);
-
+  // Generate new piece function defined before it's used in resetGame
   const generateNewPiece = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * tetrominoes.length);
     const newPiece = tetrominoes[randomIndex];
@@ -60,7 +52,16 @@ const useTetris = () => {
       y: 0,
       color: newPiece.color,
     });
-  }, []);
+  }, [tetrominoes]);
+
+  const resetGame = useCallback(() => {
+    setBoard(Array(BOARD_HEIGHT).fill(0).map(() => Array(BOARD_WIDTH).fill(0)));
+    generateNewPiece();
+    setScore(0);
+    setGameOver(false);
+    setPaused(false);
+    dropInterval.current = 1000;
+  }, [generateNewPiece]);
   
   // Check collision
   const checkCollision = useCallback((shape: number[][], x: number, y: number) => {
@@ -242,16 +243,19 @@ const useTetris = () => {
 
 const HiddenGames = () => {
   const { theme } = useTheme();
-  // Using underscore prefix to indicate intentional unused variables
-  const [_konamiActivated, setKonamiActivated] = useState(false);
+  // Actually using these variables in the UI/logic
+  const [konamiActivated, setKonamiActivated] = useState(false);
   const [drawingActive, setDrawingActive] = useState(false);
   const [tetrisActive, setTetrisActive] = useState(false);
   const [secretClickCount, setSecretClickCount] = useState(0);
-  // Using underscore prefix for intentional unused variables
-  const [_isClient, setIsClient] = useState(false);
   
-  // Track keypresses for Konami code
-  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  // Track keypresses for Konami code - wrap in useMemo to prevent array recreation
+  const konamiCode = useMemo(() => [
+    'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 
+    'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 
+    'b', 'a'
+  ], []);
+  
   const [keysPressed, setKeysPressed] = useState<string[]>([]);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -261,11 +265,6 @@ const HiddenGames = () => {
   
   // Initialize tetris game - we initialize this regardless of client/server, but only use it on the client
   const tetris = useTetris();
-
-  // Set isClient to true once the component mounts
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Konami code detection
   useEffect(() => {
@@ -296,7 +295,7 @@ const HiddenGames = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [keysPressed, tetrisActive]);
+  }, [keysPressed, tetrisActive, konamiCode]);
 
   // Drawing canvas setup
   useEffect(() => {
@@ -536,6 +535,7 @@ const HiddenGames = () => {
             
             <div className="mt-4 text-center text-sm text-gray-300">
               <p>You activated the Konami code! ↑↑↓↓←→←→BA</p>
+              {konamiActivated && <p className="mt-1 text-xs">Konami code status: Activated</p>}
             </div>
           </div>
         </div>

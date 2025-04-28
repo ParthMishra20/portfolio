@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 
 interface CommandResponse {
@@ -10,12 +9,11 @@ interface CommandResponse {
 }
 
 const InteractiveTerminal = () => {
-  // Using theme for styling terminal based on dark/light mode
-  const { theme } = useTheme();
+  // We use theme inside the component, but through className conditionals, not directly
   const [input, setInput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  // Renaming to _showInitialMessage since it's set but not directly used (but controls flow)
-  const [_showInitialMessage, setShowInitialMessage] = useState<boolean>(false);
+  // We'll actually use this variable to conditionally render the welcome message
+  const [showInitialMessage, setShowInitialMessage] = useState<boolean>(false);
   const [history, setHistory] = useState<{ command: string; response: CommandResponse }[]>([
     { command: '', response: { text: "Loading site..." } },
   ]);
@@ -34,23 +32,27 @@ const InteractiveTerminal = () => {
       // Second delay - show welcome message
       const timer2 = setTimeout(() => {
         setIsLoading(false);
-        setShowInitialMessage(true);
-        setHistory(prev => [
-          ...prev,
-          { 
-            command: '', 
-            response: { 
-              text: "Welcome to the interactive terminal! Type 'help' for available commands. Type 'secret' for something fun." 
-            } 
-          }
-        ]);
+        setShowInitialMessage(true); // This triggers showing the initial welcome message
+        
+        // Only add this welcome message if showInitialMessage is true
+        if (showInitialMessage) {
+          setHistory(prev => [
+            ...prev,
+            { 
+              command: '', 
+              response: { 
+                text: "Welcome to the interactive terminal! Type 'help' for available commands. Type 'secret' for something fun." 
+              } 
+            }
+          ]);
+        }
       }, 800);
       
       return () => clearTimeout(timer2);
     }, 1500);
 
     return () => clearTimeout(timer1);
-  }, []);
+  }, [showInitialMessage]);
 
   // Available commands
   const commands: Record<string, () => CommandResponse> = {
