@@ -1,0 +1,25 @@
+/* Custom styles for timeline component */
+
+/* Style for the date text */
+:global(.vertical-timeline-element-date) {
+  color: #38bdf8 !important; /* Bright blue color for dates */
+  font-weight: 600 !important;
+  opacity: 1 !important; /* Override the default opacity */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* Add subtle text shadow for better readability */
+}
+
+/* Additional styling for vertical timeline when in dark mode */
+:global([data-theme='dark'] .vertical-timeline::before) {
+  background: #475569 !important; /* Slightly brighter line color in dark mode */
+}
+
+/* Ensure the timeline is properly visible in both modes */
+:global(.vertical-timeline) {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Make the line thicker for better visibility */
+:global(.vertical-timeline::before) {
+  width: 5px !important; /* Thicker timeline line */
+}
