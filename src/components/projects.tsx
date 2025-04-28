@@ -16,33 +16,32 @@ interface Project {
 const projectsData: Project[] = [
   {
     id: 1,
-    title: "Interactive E-commerce Platform",
-    description: "A modern shopping experience with 3D product previews that allows users to visualize products before purchasing.",
-    tags: ["React", "Three.js", "Node.js", "MongoDB"],
-    githubLink: "https://github.com/yourusername/interactive-ecommerce",
-    liveLink: "https://interactive-ecommerce.example.com"
+    title: "Organizo",
+    description: "A responsive web application that provides users with tools to manage finances, track transactions, and visualize financial data across different devices.",
+    tags: ["React.js", "Chakra UI", "Clerk", "Supabase", "Render"],
+    githubLink: "https://github.com/ParthMishra20/organizo",
+    liveLink: "https://organizo-s7qr.onrender.com"
   },
   {
     id: 2,
-    title: "Educational Web Application",
-    description: "Platform for interactive learning with gamification elements designed to make education engaging for all ages.",
-    tags: ["Next.js", "TypeScript", "Firebase", "Framer Motion"],
-    githubLink: "https://github.com/yourusername/educational-app",
+    title: "Pokedex NFT Marketplace",
+    description: "A blockchain-powered marketplace for Pokémon-inspired NFTs, enabling users to mint, trade, and collect digital assets with secure ownership verification.",
+    tags: ["React.js", "Solidity", "Ethereum", "IPFS", "Web3.js"],
+    githubLink: "https://github.com/ParthMishra20/pokedex",
   },
   {
     id: 3,
-    title: "Agency Portfolio Site",
-    description: "Award-winning creative agency website with unique interactions and animations that showcase design expertise.",
-    tags: ["Three.js", "GSAP", "React", "Tailwind CSS"],
-    githubLink: "https://github.com/yourusername/agency-portfolio",
-    liveLink: "https://agency-portfolio.example.com"
+    title: "Eventique",
+    description: "Eventique is an event management platform designed to streamline planning, scheduling, and coordinating various events. The application aims to provide intuitive tools for event organizers while delivering seamless experiences for attendees. This project is currently under development and not yet complete.",
+    tags: ["React + TypeScript", "AWS Cloud Services", "Terraform/CloudFormation"],
+    githubLink: "https://github.com/ParthMishra20/Eventique",
   },
   {
     id: 4,
-    title: "Data Visualization Dashboard",
-    description: "Interactive dashboard for visualizing complex datasets with real-time filtering and dynamic chart generation.",
-    tags: ["D3.js", "React", "Node.js", "PostgreSQL"],
-    githubLink: "https://github.com/yourusername/data-dashboard",
+    title: "BRIDLE",
+    description: "This was my first-ever project, and although it's lacking functionalities and not great, it holds sentimental value as my first step into coding. It marks the beginning of my journey in development.",
+    tags: ["HTML", "CSS"],
+    githubLink: "https://github.com/ParthMishra20/bridle",
   },
 ];
 
