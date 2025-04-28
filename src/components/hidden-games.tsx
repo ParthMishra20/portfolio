@@ -29,6 +29,7 @@ const useTetris = () => {
   const requestRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
   const dropInterval = useRef<number>(1000); // ms
+  const [clientSideInitialized, setClientSideInitialized] = useState(false);
   
   // Tetromino shapes - wrap in useMemo to prevent recreating on each render
   const tetrominoes = useMemo(() => [
@@ -41,8 +42,15 @@ const useTetris = () => {
     { shape: [[0, 0, 1], [1, 1, 1]], color: '#ff9800' }, // J
   ], []);
 
+  // Initialize client-side only functionality
+  useEffect(() => {
+    setClientSideInitialized(true);
+  }, []);
+
   // Generate new piece function defined before it's used in resetGame
   const generateNewPiece = useCallback(() => {
+    if (!clientSideInitialized) return; // Only run on client
+
     const randomIndex = Math.floor(Math.random() * tetrominoes.length);
     const newPiece = tetrominoes[randomIndex];
     
@@ -52,16 +60,18 @@ const useTetris = () => {
       y: 0,
       color: newPiece.color,
     });
-  }, [tetrominoes]);
+  }, [tetrominoes, BOARD_WIDTH, clientSideInitialized]);
 
   const resetGame = useCallback(() => {
+    if (!clientSideInitialized) return; // Only run on client
+    
     setBoard(Array(BOARD_HEIGHT).fill(0).map(() => Array(BOARD_WIDTH).fill(0)));
     generateNewPiece();
     setScore(0);
     setGameOver(false);
     setPaused(false);
     dropInterval.current = 1000;
-  }, [generateNewPiece]);
+  }, [generateNewPiece, BOARD_HEIGHT, BOARD_WIDTH, clientSideInitialized]);
   
   // Check collision
   const checkCollision = useCallback((shape: number[][], x: number, y: number) => {
@@ -84,10 +94,12 @@ const useTetris = () => {
       }
     }
     return false;
-  }, [board]);
+  }, [board, BOARD_WIDTH, BOARD_HEIGHT]);
   
   // Rotate piece
   const rotatePiece = useCallback(() => {
+    if (!clientSideInitialized) return; // Only run on client
+    
     const rotated = currentPiece.shape[0].map((_, i) => 
       currentPiece.shape.map(row => row[i]).reverse()
     );
@@ -98,20 +110,24 @@ const useTetris = () => {
         shape: rotated,
       });
     }
-  }, [currentPiece, checkCollision]);
+  }, [currentPiece, checkCollision, clientSideInitialized]);
   
   // Move piece
   const movePiece = useCallback((dx: number) => {
+    if (!clientSideInitialized) return; // Only run on client
+    
     if (!checkCollision(currentPiece.shape, currentPiece.x + dx, currentPiece.y)) {
       setCurrentPiece({
         ...currentPiece,
         x: currentPiece.x + dx,
       });
     }
-  }, [currentPiece, checkCollision]);
+  }, [currentPiece, checkCollision, clientSideInitialized]);
   
   // Drop piece
   const dropPiece = useCallback(() => {
+    if (!clientSideInitialized) return; // Only run on client
+    
     if (!checkCollision(currentPiece.shape, currentPiece.x, currentPiece.y + 1)) {
       setCurrentPiece({
         ...currentPiece,
@@ -157,10 +173,12 @@ const useTetris = () => {
       // Generate new piece
       generateNewPiece();
     }
-  }, [board, currentPiece, checkCollision, generateNewPiece]);
+  }, [board, currentPiece, checkCollision, generateNewPiece, BOARD_WIDTH, clientSideInitialized]);
   
   // Handle keyboard input
   useEffect(() => {
+    if (!clientSideInitialized) return; // Only attach listeners on client
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameOver || paused) return;
       
@@ -190,11 +208,11 @@ const useTetris = () => {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameOver, paused, movePiece, dropPiece, rotatePiece]);
+  }, [gameOver, paused, movePiece, dropPiece, rotatePiece, clientSideInitialized]);
   
   // Game loop
   const gameLoop = useCallback((timestamp: number) => {
-    if (gameOver || paused) {
+    if (!clientSideInitialized || gameOver || paused) {
       requestRef.current = requestAnimationFrame(gameLoop);
       return;
     }
@@ -207,22 +225,26 @@ const useTetris = () => {
     }
     
     requestRef.current = requestAnimationFrame(gameLoop);
-  }, [gameOver, paused, dropPiece]);
+  }, [gameOver, paused, dropPiece, clientSideInitialized]);
   
-  // Start and stop game loop
+  // Start and stop game loop - client-side only
   useEffect(() => {
+    if (!clientSideInitialized) return;
+    
     requestRef.current = requestAnimationFrame(gameLoop);
     return () => {
       if (requestRef.current) {
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [gameLoop]);
+  }, [gameLoop, clientSideInitialized]);
   
-  // Initial setup
+  // Initial setup - client-side only
   useEffect(() => {
-    resetGame();
-  }, [resetGame]);
+    if (clientSideInitialized) {
+      resetGame();
+    }
+  }, [resetGame, clientSideInitialized]);
   
   return {
     board,
@@ -238,6 +260,7 @@ const useTetris = () => {
     movePiece,
     rotatePiece,
     dropPiece,
+    clientSideInitialized
   };
 };
 
@@ -248,6 +271,7 @@ const HiddenGames = () => {
   const [drawingActive, setDrawingActive] = useState(false);
   const [tetrisActive, setTetrisActive] = useState(false);
   const [secretClickCount, setSecretClickCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   
   // Track keypresses for Konami code - wrap in useMemo to prevent array recreation
   const konamiCode = useMemo(() => [
@@ -266,8 +290,15 @@ const HiddenGames = () => {
   // Initialize tetris game - we initialize this regardless of client/server, but only use it on the client
   const tetris = useTetris();
 
-  // Konami code detection
+  // Set mounted to true once the component mounts to ensure client-side rendering
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Konami code detection - client-side only
+  useEffect(() => {
+    if (!mounted) return;
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if (tetrisActive) return; // Don't track Konami code if Tetris is already active
       
@@ -295,25 +326,25 @@ const HiddenGames = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [keysPressed, tetrisActive, konamiCode]);
+  }, [keysPressed, tetrisActive, konamiCode, mounted]);
 
-  // Drawing canvas setup
+  // Drawing canvas setup - client-side only
   useEffect(() => {
-    if (drawingActive && canvasRef.current) {
-      const canvas = canvasRef.current;
-      canvas.width = window.innerWidth * 0.8;
-      canvas.height = window.innerHeight * 0.7;
-      
-      const context = canvas.getContext('2d');
-      if (context) {
-        context.strokeStyle = theme === 'dark' ? '#ffffff' : '#000000';
-        context.lineJoin = 'round';
-        context.lineCap = 'round';
-        context.lineWidth = 5;
-        contextRef.current = context;
-      }
+    if (!mounted || !drawingActive || !canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.7;
+    
+    const context = canvas.getContext('2d');
+    if (context) {
+      context.strokeStyle = theme === 'dark' ? '#ffffff' : '#000000';
+      context.lineJoin = 'round';
+      context.lineCap = 'round';
+      context.lineWidth = 5;
+      contextRef.current = context;
     }
-  }, [drawingActive, theme]);
+  }, [drawingActive, theme, mounted]);
 
   // Drawing functions
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -350,11 +381,11 @@ const HiddenGames = () => {
 
   // Secret click detection for drawing game
   useEffect(() => {
-    if (secretClickCount >= 5) {
+    if (secretClickCount >= 5 && mounted) {
       setDrawingActive(true);
       setSecretClickCount(0);
     }
-  }, [secretClickCount]);
+  }, [secretClickCount, mounted]);
 
   const handleSecretClick = () => {
     setSecretClickCount(prev => prev + 1);
@@ -376,6 +407,11 @@ const HiddenGames = () => {
       contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
   };
+
+  // Don't render anything during SSR to prevent hydration issues
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>
@@ -432,7 +468,7 @@ const HiddenGames = () => {
       )}
       
       {/* Tetris Game */}
-      {tetrisActive && (
+      {tetrisActive && tetris.clientSideInitialized && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
           <div className={`p-6 rounded-lg max-w-lg w-full ${theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-gray-800 border border-gray-700'}`}>
             <div className="flex justify-between items-center mb-4">

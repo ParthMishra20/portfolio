@@ -12,14 +12,19 @@ const InteractiveTerminal = () => {
   // We use theme inside the component, but through className conditionals, not directly
   const [input, setInput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  // We'll actually use this variable to conditionally render the welcome message
   const [showInitialMessage, setShowInitialMessage] = useState<boolean>(false);
   const [history, setHistory] = useState<{ command: string; response: CommandResponse }[]>([
     { command: '', response: { text: "Loading site..." } },
   ]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const [currentDateTime, setCurrentDateTime] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
+
+  // Update the current date/time only on the client
+  useEffect(() => {
+    setCurrentDateTime(new Date().toLocaleString());
+  }, []);
 
   // Simulate site loading
   useEffect(() => {
@@ -165,7 +170,8 @@ const InteractiveTerminal = () => {
       return { text: 'Clearing terminal...' };
     },
     date: () => ({
-      text: `Current date: ${new Date().toLocaleString()}`
+      // Use the state variable instead of calling Date directly
+      text: `Current date: ${currentDateTime}`
     }),
   };
 
