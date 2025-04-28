@@ -5,7 +5,6 @@ import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeli
 import 'react-vertical-timeline-component/style.min.css';
 import { Briefcase, GraduationCap, Award, Star } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import styles from './timeline.module.css'; // Import our custom CSS module
 
 const Timeline = () => {
   const { theme, systemTheme } = useTheme();
@@ -32,12 +31,6 @@ const Timeline = () => {
   
   const contentArrowStyle = {
     borderRight: isDark ? '7px solid #1e293b' : '7px solid #ffffff'
-  };
-  
-  // Custom date style to improve visibility
-  const dateStyle = {
-    color: isDark ? '#38bdf8' : '#1e40af', // Bright blue for dark mode, dark blue for light mode
-    fontWeight: 600,
   };
 
   return (

@@ -56,7 +56,7 @@ const StarField = ({ count = 1000, speed = 0.3 }) => {
   
   // Move stars upward on each frame - adjust for scrolling
   useFrame((state) => {
-    const { clock } = state;
+    // Removed unused clock destructuring - use state directly if needed
     
     if (pointsRef.current) {
       const positions = pointsRef.current.geometry.attributes.position.array;

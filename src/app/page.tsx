@@ -7,6 +7,7 @@ import HiddenGames from "@/components/hidden-games";
 import Navigation from "@/components/navigation";
 import LoadingScreen from "@/components/loading";
 import ScrollToTopButton from "@/components/scroll-to-top";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -51,9 +52,7 @@ export default function Home() {
       {/* Hidden Games - not visible in the navigation */}
       <HiddenGames />
       
-      <footer className="py-8 text-center text-sm text-gray-300 dark:text-gray-400 bg-gray-800 dark:bg-gray-900">
-        © {new Date().getFullYear()} My Interactive Portfolio. Click around, you might find some easter eggs!
-      </footer>
+      <Footer />
     </div>
   );
 }

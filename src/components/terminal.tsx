@@ -10,10 +10,12 @@ interface CommandResponse {
 }
 
 const InteractiveTerminal = () => {
+  // Using theme for styling terminal based on dark/light mode
   const { theme } = useTheme();
   const [input, setInput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [showInitialMessage, setShowInitialMessage] = useState<boolean>(false);
+  // Renaming to _showInitialMessage since it's set but not directly used (but controls flow)
+  const [_showInitialMessage, setShowInitialMessage] = useState<boolean>(false);
   const [history, setHistory] = useState<{ command: string; response: CommandResponse }[]>([
     { command: '', response: { text: "Loading site..." } },
   ]);

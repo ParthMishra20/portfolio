@@ -16,6 +16,9 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const { theme } = useTheme();
 
+  // Additional theme-based styling
+  const navBg = theme === 'dark' ? 'bg-gray-900/90' : 'bg-gray-800/90';
+
   // Navigation items with icons, reordered as requested
   const navItems: NavItem[] = [
     {
@@ -108,7 +111,7 @@ const Navigation = () => {
         transition={{ duration: 0.5 }}
         className={`hidden md:flex fixed top-4 left-1/2 transform -translate-x-1/2 z-50 rounded-full px-4 py-2 ${
           isScrolled
-            ? `bg-gray-900/90 backdrop-blur-lg shadow-lg border border-gray-800/50`
+            ? `${navBg} backdrop-blur-lg shadow-lg border border-gray-800/50`
             : 'bg-transparent'
         } transition-all duration-300`}
       >

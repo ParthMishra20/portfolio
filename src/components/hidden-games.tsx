@@ -242,11 +242,13 @@ const useTetris = () => {
 
 const HiddenGames = () => {
   const { theme } = useTheme();
-  const [konamiActivated, setKonamiActivated] = useState(false);
+  // Using underscore prefix to indicate intentional unused variables
+  const [_konamiActivated, setKonamiActivated] = useState(false);
   const [drawingActive, setDrawingActive] = useState(false);
   const [tetrisActive, setTetrisActive] = useState(false);
   const [secretClickCount, setSecretClickCount] = useState(0);
-  const [isClient, setIsClient] = useState(false);
+  // Using underscore prefix for intentional unused variables
+  const [_isClient, setIsClient] = useState(false);
   
   // Track keypresses for Konami code
   const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];

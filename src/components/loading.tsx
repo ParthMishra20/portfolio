@@ -25,7 +25,7 @@ const LoadingScreen = () => {
       animate={{ opacity: isLoading ? 1 : 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
-      className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-gray-900"
+      className={`fixed inset-0 flex flex-col items-center justify-center z-50 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-800'}`}
     >
       <div className="flex flex-col items-center">
         <motion.div
