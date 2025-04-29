@@ -127,7 +127,7 @@ const Hero = () => {
 
         <div className="relative group">
           <a 
-            href="#" 
+            href="https://drive.google.com/file/d/1wZG6x9QHsS2LjPWm8eQkEmYGV1kGzZbx/view?usp=sharing" 
             target="_blank" 
             rel="noopener noreferrer"
             className="p-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white transition-colors inline-flex"
